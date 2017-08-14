@@ -1,1 +1,4 @@
 *.acid.*
+.DS_Store
+*.tga
+*.mov

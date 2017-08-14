@@ -6,20 +6,16 @@
 
 import static java.lang.Math.toIntExact;
 
-PImage input, output;
-int RADIUS = 9;  // Larger numbers take longer, but produce more interesting results
-String IMAGENAME = "hennepin";  // Name of image before extension
-String IMAGEEXT = "png";  // Extension without period
-boolean SAVEME = false;  // Whether to save image or not
+PImage input;
 
-void setup() {
-  colorMode(RGB, 255, 255, 255);
-  input = loadImage(IMAGENAME + "." + IMAGEEXT);
-  size(1, 1);
-  surface.setResizable(true);
-  surface.setSize(input.width, input.height);
-  input.loadPixels();
-  output = createImage(input.width, input.height, RGB);
+int RADIUS = 9;  // Larger numbers take longer, but produce more interesting results
+String IMAGENAME = "drake";  // Name of image before extension
+String IMAGEEXT = "png";  // Extension without period
+boolean ITERATE = false;  // Iteratively acidify
+boolean SAVEME = false;  // Whether to save image or not. Saves frames to convert to movie using MovieMaker if ITERATE is true.
+
+PImage acidify(PImage input) {
+  PImage output = createImage(input.width, input.height, RGB);
   for(int i = 0; i < input.pixels.length; i++) {
     int x = i % input.width,
         y = i / input.width;
@@ -35,10 +31,25 @@ void setup() {
     }
     output.pixels[i] = toIntExact(sum / count);
   }
-  noLoop();
+  return output;
+}
+
+void setup() {
+  colorMode(RGB, 255, 255, 255);
+  input = loadImage(IMAGENAME + "." + IMAGEEXT);
+  size(1, 1);
+  surface.setResizable(true);
+  surface.setSize(input.width, input.height);
+  input.loadPixels();
+  if(!ITERATE) noLoop();
 }
 
 void draw() {
-  image(output, 0, 0);
-  if(SAVEME) output.save(IMAGENAME + ".acid." + IMAGEEXT);
+  input = acidify(input);
+  image(input, 0, 0);
+  if(SAVEME && !ITERATE) {
+    input.save(IMAGENAME + ".acid." + IMAGEEXT);
+  } else if(SAVEME && ITERATE) {
+    saveFrame(IMAGENAME + "/frame-####.tga");
+  }
 }
